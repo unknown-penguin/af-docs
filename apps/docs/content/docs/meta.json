@@ -1,11 +1,16 @@
 {
-  "title": "Documentation",
+  "title": "AF Docs",
   "pages": [
     "index",
-    "---Guides---",
+    "---Запуск---",
     "quick-start",
-    "diagramming",
-    "---OpenAPI---",
+    "environment",
+    "---Архітектура---",
+    "architecture",
+    "---Потоки---",
+    "flows",
+    "data-model",
+    "---API---",
     "openapi"
   ]
 }

@@ -1,0 +1,11 @@
+{
+  "title": "Потоки",
+  "icon": "GitBranch",
+  "pages": [
+    "auth",
+    "task-lifecycle",
+    "comments-offline",
+    "payroll",
+    "push-navigation"
+  ]
+}

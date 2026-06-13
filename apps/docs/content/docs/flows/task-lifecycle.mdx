@@ -1,0 +1,15 @@
+---
+title: Tasks
+description: Створення, завершення і повторне відкриття задач
+icon: ListChecks
+---
+
+# Потік задач
+
+Створення задачі приймає multipart form-data: текст, виконавців і вкладення. Backend створює task, assignments, media rows, пише файли і відправляє Telegram/FCM notifications.
+
+<Diagram lang="mermaid" path="create-task.mmd" alt="Create task sequence" />
+
+Завершення та повторне відкриття змінюють `tasks.status`, оновлюють `completed_by` і нотифікують виконавців та автора.
+
+<Diagram lang="mermaid" path="task-status.mmd" alt="Complete and reopen task sequence" />

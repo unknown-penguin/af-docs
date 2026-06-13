@@ -4,7 +4,9 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-const BASE_DIR = path.resolve(process.cwd(), 'diagrams');
+const BASE_DIR = process.env.DIAGRAMS_DIR
+  ? path.resolve(process.env.DIAGRAMS_DIR)
+  : path.resolve(process.cwd(), 'diagrams');
 const LANG_MAP: Record<string, string> = {
   puml: 'plantuml',
   plantuml: 'plantuml',
@@ -128,7 +130,7 @@ const handleRequest = async (req: NextRequest) => {
       });
     }
 
-    const krokiBase = process.env.KROKI_BASE_URL ?? 'http://kroki:8000';
+    const krokiBase = process.env.KROKI_BASE_URL ?? 'http://localhost:8000';
 
     const encoded = await encode(diagramContent);
     const svgUrl = `${krokiBase}/${kind}/svg`

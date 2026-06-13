@@ -1,0 +1,20 @@
+flowchart LR
+    employee["Працівник"]
+    manager["Менеджер"]
+    admin["Адміністратор"]
+
+    af["AF System<br/>Flutter app + FastAPI backend"]
+
+    telegram["Telegram Bot API"]
+    fcm["Firebase Cloud Messaging"]
+    postgres["PostgreSQL"]
+    uploads["Upload storage"]
+
+    employee -->|"Задачі, коментарі, payroll"| af
+    manager -->|"Payroll review"| af
+    admin -->|"Керування задачами і ролями"| af
+
+    af -->|"Bot messages"| telegram
+    af -->|"Push notifications"| fcm
+    af -->|"SQLAlchemy asyncpg"| postgres
+    af -->|"Файли /uploads"| uploads

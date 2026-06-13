@@ -1,0 +1,55 @@
+flowchart TB
+    subgraph flutter["Flutter app"]
+        screens["Screens<br/>Login, Tasks, TaskDetail, Profile, Menu, Payroll"]
+        apiService["ApiService<br/>Dio, JWT header, cache, offline queue"]
+        pushService["PushNotificationService<br/>FCM token, refresh stream, tap navigation"]
+        appConfig["AppConfig<br/>dev/prod env, upload URL resolver"]
+        prefs[("SharedPreferences<br/>token, cache, queue, theme")]
+    end
+
+    subgraph backend["FastAPI API"]
+        auth["Auth routes<br/>/token, /refresh, /register, /users/me"]
+        users["User routes<br/>profile, roles, employees, telegram link"]
+        tasks["Task routes<br/>CRUD, comments, complete, reopen, history"]
+        payroll["Payroll routes<br/>reports, objects, mark checked"]
+        security["Security<br/>JWT, password hash, current user"]
+        media["Media services<br/>duration, playback normalization"]
+        dbSession["DB session<br/>Async engine and sessionmaker"]
+        notify["Notification helpers<br/>Telegram + FCM"]
+        reminders["Reminder job<br/>active task reminders"]
+    end
+
+    db[("PostgreSQL")]
+    files[("uploads/")]
+    tg["Telegram Bot API"]
+    fcm["Firebase Cloud Messaging"]
+
+    screens --> apiService
+    screens --> pushService
+    apiService --> appConfig
+    apiService --> prefs
+    pushService --> apiService
+
+    apiService --> auth
+    apiService --> users
+    apiService --> tasks
+    apiService --> payroll
+
+    auth --> security
+    users --> security
+    tasks --> security
+    payroll --> security
+    auth --> dbSession
+    users --> dbSession
+    tasks --> dbSession
+    payroll --> dbSession
+    tasks --> media
+    tasks --> notify
+    payroll --> notify
+    reminders --> dbSession
+    reminders --> notify
+
+    dbSession --> db
+    media --> files
+    notify --> tg
+    notify --> fcm

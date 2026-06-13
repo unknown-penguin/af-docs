@@ -6,7 +6,9 @@ services:
     environment:
       - NODE_ENV=development
       - API_RES_PATH=openapi
+      - AF_OPENAPI_SKIP_EXPORT=true
       - KROKI_BASE_URL=http://kroki:8000
+      - DIAGRAMS_DIR=/app/apps/docs/diagrams
       - WATCHPACK_POLLING=true
     ports:
       - "3000:3000"

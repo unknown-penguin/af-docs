@@ -1,0 +1,34 @@
+sequenceDiagram
+    actor Employee as Працівник
+    actor Manager as Manager/Admin
+    participant App as Flutter app
+    participant ApiService
+    participant API as FastAPI payroll routes
+    participant Files as uploads/
+    participant DB as PostgreSQL
+    participant TG as Telegram Bot API
+
+    Employee->>App: Заповнює payroll report
+    App->>ApiService: submitPayrollReport(objectName, comment, files)
+    ApiService->>API: POST /payroll multipart/form-data
+    API->>DB: insert PayrollReport
+    loop файли
+        API->>Files: write upload
+        API->>DB: insert PayrollMedia
+    end
+    API->>DB: commit
+    API->>DB: select users role admin/superadmin
+    loop admins
+        API->>TG: send payroll notification
+    end
+    API-->>ApiService: PayrollReportResponse
+
+    Manager->>App: Переглядає reports
+    App->>ApiService: GET /payroll/reports
+    ApiService->>API: GET /payroll/reports?object_name=&is_checked=
+    API->>DB: select PayrollReport with media/user
+    API-->>ApiService: reports
+    Manager->>App: Позначає перевіреним
+    App->>ApiService: POST /payroll/{report_id}/check
+    ApiService->>API: POST /payroll/{report_id}/check
+    API->>DB: set is_checked=true

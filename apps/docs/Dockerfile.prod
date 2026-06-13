@@ -25,6 +25,9 @@ COPY apps/docs/ ./apps/docs/
 # Install all dependencies (including dev dependencies for building)
 RUN pnpm install --frozen-lockfile
 
+ENV AF_OPENAPI_SKIP_EXPORT=true
+ENV NEXT_OUTPUT=standalone
+
 # Generate OpenAPI docs and build the application
 RUN pnpm build:openapi && \
     pnpm turbo build --filter=docs
@@ -45,11 +48,13 @@ WORKDIR /app
 # Set environment variables
 ENV NODE_ENV=production \
     PORT=3000 \
+    DIAGRAMS_DIR=/app/diagrams \
     NEXT_TELEMETRY_DISABLED=1
 
 # Copy standalone output and static files
 COPY --from=builder --chown=nextjs:nodejs /app/apps/docs/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/docs/.next/static ./apps/docs/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/docs/diagrams ./diagrams
 
 # Expose port
 EXPOSE 3000

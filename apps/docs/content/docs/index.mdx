@@ -1,52 +1,29 @@
 ---
-title: Introduction
-description: Developer-first documentation with diagrams-as-code and more
+title: Вступ
+description: Технічна документація AF app та AF API
 icon: Book
 ---
 
-# Welcome to Diagramming Guru
+# AF Docs
 
-This is a **developer-first** documentation stack that combines:
+Цей docs-проєкт описує поточну реалізацію `af_app` і `af_api`: мобільний Flutter застосунок, FastAPI backend, PostgreSQL модель, файлові вкладення, Telegram-бота, Firebase push notifications і планувальник нагадувань.
 
-- **Fumadocs v15** for beautiful, fast MDX documentation
-- **Kroki** for rendering diagrams from code
-- **Mermaid** for inline diagrams with dark/light theme support
-- **React Flow** for zoomable diagram viewing
+## Що тут є
 
-## Features
+- C1-C4 діаграми архітектури.
+- Sequence diagrams для auth, задач, коментарів, payroll і push-навігації.
+- ERD для SQLAlchemy моделей і Alembic schema.
+- OpenAPI reference, згенерований з FastAPI `app.openapi()`.
+- Інструкції локального та Docker запуску docs.
+- Опис `.env` конфігурації для backend і frontend.
 
+## Межі документації
 
-### 🚀 Hot Reload in Docker
-The entire stack runs in Docker with hot reload enabled for fast development.
+Docs не змінюють поведінку `af_app` або `af_api`. Вони читають поточний backend-код для генерації OpenAPI schema і зберігають результат у `apps/docs/openapi/af-api.json`.
 
-### 🔒 Secure by Default
-- Path traversal protection
-- File size limits
-- Language allowlist
-- No code execution
+## Основні частини системи
 
-### 📦 One-Command Setup
-
-```bash
-./scripts/dev.sh
-# or
-pnpm dev
-```
-
-That's it! Both services (docs + Kroki) start with a single command.
-
-## Getting Started
-
-1. Clone the repository
-2. Run `pnpm dev` to start both services
-3. Visit `http://localhost:3000`
-4. Edit MDX files or diagrams - changes reflect immediately!
-
-## Supported Diagram Languages
-
-- **PlantUML** (`puml`, `plantuml`)
-- **Graphviz** (`dot`, `graphviz`)
-- **Mermaid** (inline via `<Mermaid>` or via Kroki)
-- **C4 PlantUML** (`c4plantuml`)
-
-Easily extensible to support more Kroki-compatible formats!
+- `af_app` - Flutter client з `Provider`, `Dio`, `SharedPreferences`, Firebase Messaging і екранами задач, профілю, меню та payroll.
+- `af_api` - FastAPI backend з JWT auth, SQLAlchemy async sessions, Alembic migrations, upload storage, Telegram Bot API, Firebase Admin SDK і APScheduler.
+- PostgreSQL - основне сховище користувачів, задач, повідомлень, вкладень і payroll-звітів.
+- `uploads/` - файлове сховище для task/comment/payroll media.

@@ -1,0 +1,17 @@
+---
+title: Auth
+description: Login, JWT storage і token refresh
+icon: KeyRound
+---
+
+# Auth: login і refresh
+
+Flutter app логіниться через `/token`, зберігає JWT у `SharedPreferences`, а при startup виконує `/refresh` перед переходом на `HomeScreen`.
+
+<Diagram lang="mermaid" path="auth-token.mmd" alt="Login and refresh sequence" />
+
+## Важливі деталі
+
+- `ApiService` додає `Authorization: Bearer ...` через Dio interceptor.
+- `/users/me` використовується для кешування поточного профілю.
+- При `401` токен видаляється і користувач повертається на login flow.

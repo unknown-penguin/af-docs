@@ -12,8 +12,10 @@ RUN pnpm install --frozen-lockfile
 
 EXPOSE 3000
 ENV PORT=3000
+ENV AF_OPENAPI_SKIP_EXPORT=true
+ENV DIAGRAMS_DIR=/app/apps/docs/diagrams
 
 RUN pnpm build:openapi
 
 # Start dev server
-CMD ["pnpm", "turbo", "dev", "--filter=docs"]
+CMD ["pnpm", "--dir", "apps/docs", "dev"]

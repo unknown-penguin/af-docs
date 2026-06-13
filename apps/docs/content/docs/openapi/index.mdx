@@ -1,22 +1,14 @@
 ---
-title: OpenAPI
-description: View the Scalar Galaxy example OpenAPI schema.
+title: AF API
+description: OpenAPI reference, згенерований з FastAPI backend.
 ---
 
-## Features
+# AF API Reference
 
-The official OpenAPI integration supports:
+Цей розділ генерується з FastAPI `app.openapi()` у `af_api`. Схема зберігається у `apps/docs/openapi/af-api.json`, а MDX-сторінки endpoint reference створюються командою:
 
-- Basic API endpoint information
-- Interactive API playground
-- Example code to send request (in different programming languages)
-- Response samples and TypeScript definitions
-- Request parameters and body generated from schemas
-
-> Only OpenAPI 3.0 and 3.1 are supported.
-
-Generate docs with the script:
-
-```bash
+```powershell
 pnpm build:openapi
 ```
+
+Генератор не запускає web server і не виконує lifespan startup. Він лише імпортує FastAPI app і читає OpenAPI metadata.

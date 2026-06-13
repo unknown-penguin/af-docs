@@ -4,7 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["API_RES_PATH", "IS_PROD_STATIC", "GITHUB_PAGES_REPO_NAME"],
+      "env": ["API_RES_PATH", "AF_API_ROOT", "AF_OPENAPI_SKIP_EXPORT", "IS_PROD_STATIC", "GITHUB_PAGES_REPO_NAME"]
     },
     "dev": {
       "persistent": true,
@@ -25,12 +25,13 @@
     "build:openapi": {
       "dependsOn": ["^build:openapi"],
       "outputs": ["apps/docs/content/docs/openapi/**"],
+      "env": ["API_RES_PATH", "AF_API_ROOT", "AF_OPENAPI_SKIP_EXPORT"],
       "cache": false
     },
     "build:api-doc": {
       "dependsOn": ["^build:api-doc"],
       "outputs": ["apps/docs/content/docs/**"],
-      "env": ["API_RES_PATH", "IS_PROD_STATIC", "GITHUB_PAGES_REPO_NAME"],
+      "env": ["API_RES_PATH", "AF_API_ROOT", "AF_OPENAPI_SKIP_EXPORT", "IS_PROD_STATIC", "GITHUB_PAGES_REPO_NAME"],
       "cache": false
     }
   }

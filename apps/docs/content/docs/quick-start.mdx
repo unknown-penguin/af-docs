@@ -1,7 +1,71 @@
 ---
-title: Quick Start
-description: Quick start guide for Hyperion
+title: Запуск
+description: Локальний, Docker development і production запуск AF Docs
 icon: Rocket
 ---
 
-# Quick Start
+# Запуск AF Docs
+
+## Локально
+
+```powershell
+cd af-docs
+pnpm install
+pnpm build:openapi
+pnpm dev
+```
+
+Після запуску відкрийте `http://localhost:3000`.
+
+`pnpm build:openapi` імпортує FastAPI app з `../af_api` і пише схему у `apps/docs/openapi/af-api.json`. Потрібен валідний `af_api/.env`, але API server не запускається.
+
+Опис backend/frontend `.env` файлів дивіться у розділі [Змінні середовища](/docs/environment).
+
+## Docker development
+
+```powershell
+cd af-docs
+pnpm dev:docker
+```
+
+Docker Compose піднімає:
+
+- `docs` на `http://localhost:3000`
+- `kroki` на `http://localhost:8000`
+
+Зупинка:
+
+```powershell
+pnpm stop:docker
+```
+
+## Production Docker
+
+```powershell
+cd af-docs
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Production image збирається через `apps/docs/Dockerfile.prod`, використовує standalone Next.js output і локальний Kroki service. Файли `apps/docs/diagrams` копіюються у runtime image як `/app/diagrams`.
+
+## Команди
+
+| Команда | Призначення |
+| --- | --- |
+| `pnpm dev` | Локальний Next.js dev server |
+| `pnpm dev:docker` | Development stack у Docker |
+| `pnpm stop:docker` | Зупинка Docker stack |
+| `pnpm build:openapi` | Export FastAPI OpenAPI schema і генерація API docs |
+| `pnpm build` | Production build docs |
+| `pnpm start` | Запуск production Next.js після build |
+
+## Змінні середовища
+
+| Змінна | Default | Призначення |
+| --- | --- | --- |
+| `API_RES_PATH` | `openapi` | Docs folder для згенерованого API reference |
+| `AF_API_ROOT` | `../../../af_api` | Шлях від `apps/docs` до backend-проєкту |
+| `AF_API_PYTHON` | auto | Явний Python interpreter для export script |
+| `AF_OPENAPI_SKIP_EXPORT` | `false` | Використати вже згенерований `af-api.json` |
+| `KROKI_BASE_URL` | `http://localhost:8000` | Kroki renderer для PlantUML/C4/Graphviz |
+| `DIAGRAMS_DIR` | `process.cwd()/diagrams` | Директорія diagram source files |

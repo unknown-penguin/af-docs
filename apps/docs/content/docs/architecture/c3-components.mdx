@@ -1,0 +1,20 @@
+---
+title: C3 Components
+description: Основні frontend і backend компоненти поточної реалізації
+icon: Component
+---
+
+# C3 Components
+
+Компонентний рівень показує, як Flutter screens/services взаємодіють із FastAPI routes, сервісами media processing, security layer і persistence layer.
+
+<Diagram lang="mermaid" path="c3-components.mmd" alt="C3 component diagram for AF" />
+
+## Ключові компоненти
+
+| Частина | Компоненти |
+| --- | --- |
+| Flutter | `ApiService`, `PushNotificationService`, screens задач, профілю, меню, payroll |
+| Backend | auth/users routers, task/payroll routes у `main.py`, security, media services, DB session |
+| Persistence | SQLAlchemy models, Alembic migrations, PostgreSQL |
+| Notifications | aiogram Bot, Firebase Admin SDK, APScheduler |

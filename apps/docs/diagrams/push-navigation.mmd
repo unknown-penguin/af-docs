@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant App as Flutter app
+    participant Push as PushNotificationService
+    participant Firebase as Firebase Messaging SDK
+    participant ApiService
+    participant API as FastAPI auth route
+    participant FCM as Firebase Cloud Messaging
+    participant Nav as navigatorKey
+
+    App->>ApiService: tryAutoLogin()
+    ApiService-->>App: isLoggedIn=true
+    App->>Push: initialize(apiService, logger)
+    Push->>Firebase: requestPermission()
+    Firebase-->>Push: authorized
+    Push->>Firebase: getToken()
+    Firebase-->>Push: FCM token
+    Push->>ApiService: sendFcmToken(token)
+    ApiService->>API: POST /users/fcm-token
+    API-->>ApiService: Token updated
+
+    FCM-->>Firebase: push payload { task_id, type }
+    Firebase-->>Push: onMessage / onMessageOpenedApp
+    alt foreground
+        Push->>Push: refreshStreamController.add(data)
+    else tap/background initial message
+        Push->>Nav: push TaskDetailScreen(taskId)
+    end

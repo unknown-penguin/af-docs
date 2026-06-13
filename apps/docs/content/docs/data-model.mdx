@@ -1,0 +1,24 @@
+---
+title: Data Model
+description: ERD для SQLAlchemy моделей AF API
+icon: Database
+---
+
+# Data Model
+
+ERD побудована на поточних SQLAlchemy models у `af_api/app/models.py` і Alembic migrations.
+
+<Diagram lang="mermaid" path="erd.mmd" alt="AF entity relationship diagram" />
+
+## Таблиці
+
+| Таблиця | Призначення |
+| --- | --- |
+| `users` | Користувачі, ролі, Telegram ID, FCM token, sync code |
+| `tasks` | Задачі, статус, автор, виконавець завершення |
+| `task_assignments` | Призначення задач користувачам і Telegram message id |
+| `task_media` | Вкладення задач |
+| `task_messages` | Коментарі до задач |
+| `message_media` | Вкладення коментарів |
+| `payroll_reports` | Payroll/object reports |
+| `payroll_media` | Вкладення payroll reports |

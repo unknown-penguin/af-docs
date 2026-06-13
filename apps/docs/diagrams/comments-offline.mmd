@@ -1,0 +1,39 @@
+sequenceDiagram
+    actor User as Користувач
+    participant App as Flutter app
+    participant ApiService
+    participant Local as SharedPreferences
+    participant API as FastAPI comments
+    participant Files as uploads/
+    participant DB as PostgreSQL
+    participant TG as Telegram Bot API
+    participant FCM as Firebase Cloud Messaging
+
+    User->>App: Додає коментар
+    App->>ApiService: addComment(taskId, text, files)
+    alt мережа доступна
+        ApiService->>API: POST /tasks/{task_id}/comments multipart/form-data
+        API->>DB: insert TaskMessage
+        loop файли
+            API->>Files: write upload
+            API->>DB: insert MessageMedia
+        end
+        API->>DB: commit
+        API->>DB: load task assignments and admins
+        loop отримувачі
+            API->>TG: send comment notification
+            API->>FCM: send comment push
+        end
+        API-->>ApiService: TaskMessageResponse
+        ApiService->>ApiService: syncOfflineQueue()
+    else network error
+        ApiService->>Local: append offline_action_queue add_comment
+        ApiService-->>App: queued locally
+    end
+
+    Note over ApiService,Local: Наступний успішний запит або refresh task list
+    ApiService->>Local: read offline_action_queue
+    loop queued actions
+        ApiService->>API: replay add_comment / complete_task
+    end
+    ApiService->>Local: remove successful actions

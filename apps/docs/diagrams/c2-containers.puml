@@ -1,0 +1,31 @@
+@startuml af-c2-containers
+!include <C4/C4_Container>
+
+LAYOUT_WITH_LEGEND()
+title AF - C2 Containers
+
+Person(user, "Користувач AF", "Працівник, менеджер, admin або superadmin.")
+
+System_Boundary(af, "AF") {
+  Container(app, "Flutter1 app", "Flutter / Dart", "UI, auth state, local cache, offline queue, push navigation.")
+  Container(api, "FastAPI API", "Python / FastAPI", "JWT auth, задачі, коментарі, payroll, media upload, notifications.")
+  ContainerDb(db, "PostgreSQL", "PostgreSQL", "Користувачі, задачі, коментарі, media metadata, payroll reports.")
+  Container(storage, "Upload storage", "File system", "Фізичні файли з task/comment/payroll uploads.")
+  Container(scheduler, "Reminder scheduler", "APScheduler", "Cron-нагадування по активних задачах.")
+  Container(migrations, "Alembic migrations", "Alembic", "Перевірка і upgrade database schema на startup.")
+}
+
+System_Ext(telegram, "Telegram Bot API", "Зовнішній Telegram delivery channel.")
+System_Ext(fcm, "Firebase Cloud Messaging", "Зовнішній push delivery channel.")
+
+Rel(user, app, "Працює у мобільному UI")
+Rel(app, api, "REST requests, multipart uploads", "HTTPS / JSON / form-data")
+Rel(api, db, "Read/write", "SQLAlchemy asyncpg")
+Rel(api, storage, "Write/read uploads", "File system")
+Rel(api, telegram, "Send task/comment/payroll messages", "aiogram")
+Rel(api, fcm, "Send push notifications", "Firebase Admin SDK")
+Rel(scheduler, db, "Reads active assignments")
+Rel(scheduler, fcm, "Sends reminders")
+Rel(migrations, db, "Applies schema changes")
+
+@enduml

@@ -1,0 +1,84 @@
+erDiagram
+    users {
+        int id PK
+        bigint telegram_id UK
+        string name
+        string username UK
+        string password
+        string role
+        datetime joined_at
+        string fcm_token
+        string requested_role
+        string telegram_sync_code
+    }
+
+    tasks {
+        int task_id PK
+        text text
+        string status
+        datetime created_at
+        int creator_id FK
+        int completed_by FK
+    }
+
+    task_assignments {
+        int id PK
+        int task_id FK
+        int user_id FK
+        bigint message_id
+    }
+
+    task_media {
+        int media_id PK
+        int task_id FK
+        string file_path
+        string file_type
+        string original_name
+        int size_bytes
+        float duration_seconds
+    }
+
+    task_messages {
+        int msg_id PK
+        int task_id FK
+        int sender_id FK
+        text text
+        datetime created_at
+    }
+
+    message_media {
+        int id PK
+        int msg_id FK
+        string file_path
+        string file_type
+        string original_name
+        int size_bytes
+        float duration_seconds
+    }
+
+    payroll_reports {
+        int id PK
+        int user_id FK
+        string object_name
+        text comment
+        boolean is_checked
+        datetime created_at
+    }
+
+    payroll_media {
+        int id PK
+        int report_id FK
+        string file_path
+        string file_type
+    }
+
+    users ||--o{ tasks : creates
+    users ||--o{ tasks : completes
+    users ||--o{ task_assignments : receives
+    tasks ||--o{ task_assignments : has
+    tasks ||--o{ task_media : has
+    tasks ||--o{ task_messages : has
+    users ||--o{ task_messages : writes
+    task_messages ||--o{ message_media : has
+    users ||--o{ payroll_reports : submits
+    payroll_reports ||--o{ payroll_media : has

@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:openapi": "pnpm dlx tsx ./scripts/generate-docs.ts",
+    "build:openapi": "node ./scripts/generate-docs.mjs",
     "build:api-doc": "pnpm build:openapi",
     "prebuild": "pnpm build:openapi",
     "build": "next build",
-    "dev": "next dev --turbo",
+    "dev": "node ./scripts/dev.mjs",
     "start": "next start",
     "typegen": "next typegen",
     "postinstall": "fumadocs-mdx && pnpm typegen",

@@ -1,0 +1,21 @@
+---
+title: C2 Containers
+description: "Контейнери AF: Flutter, FastAPI, PostgreSQL, storage та інтеграції"
+icon: Boxes
+---
+
+# C2 Containers
+
+На рівні контейнерів AF має мобільний client, backend API, базу даних, файлове сховище, планувальник нагадувань і зовнішні notification-сервіси.
+
+<Diagram lang="mermaid" path="c2-containers.mmd" alt="C2 container diagram for AF" />
+
+## Runtime-відповідальність
+
+| Контейнер | Відповідальність |
+| --- | --- |
+| Flutter app | UI, token storage, offline queue, cache, push navigation |
+| FastAPI API | Auth, задачі, коментарі, payroll, media upload, notifications |
+| PostgreSQL | Persistence через SQLAlchemy async sessions |
+| Upload storage | Фізичні файли у `uploads/` |
+| APScheduler | Регулярні reminders по активних задачах |

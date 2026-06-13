@@ -1,0 +1,36 @@
+sequenceDiagram
+    actor User as Виконавець/Admin
+    participant App as Flutter app
+    participant ApiService
+    participant API as FastAPI task endpoints
+    participant DB as PostgreSQL
+    participant TG as Telegram Bot API
+    participant FCM as Firebase Cloud Messaging
+
+    User->>App: Завершує задачу
+    App->>ApiService: completeTask(taskId)
+    ApiService->>API: POST /tasks/{task_id}/complete
+    API->>DB: load Task
+    API->>DB: set status=done, completed_by=current_user.id
+    API->>DB: load assignments and creator
+    loop виконавці та автор
+        alt має telegram_id
+            API->>TG: send completion message
+        end
+        alt має fcm_token
+            API->>FCM: send task_completed push
+        end
+    end
+    API-->>ApiService: status done
+
+    actor Admin as Admin/Superadmin
+    Admin->>App: Повертає задачу в роботу
+    App->>ApiService: reopenTask(taskId)
+    ApiService->>API: POST /tasks/{task_id}/reopen
+    API->>DB: check role and load task
+    API->>DB: set status=active, completed_by=null
+    loop виконавці
+        API->>TG: send reopened task message
+        API->>FCM: send reopen push
+    end
+    API-->>ApiService: status active

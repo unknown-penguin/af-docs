@@ -1,0 +1,155 @@
+---
+title: Змінні середовища
+description: Опис .env конфігурації для AF API backend і Flutter frontend
+icon: Settings
+---
+
+# Змінні середовища
+
+Ця сторінка описує runtime-конфігурацію для двох основних частин системи:
+
+- `af_api` - backend/FastAPI.
+- `af_app` - frontend/Flutter client.
+
+Не комітьте реальні секрети: Telegram bot token, JWT secret, Firebase service account, паролі та production API URL мають залишатися локальними або в secret storage CI/CD.
+
+## Backend: `af_api/.env`
+
+Backend читає `af_api/.env` у `app/core/config.py` через `python-dotenv`. Цей файл потрібен для:
+
+- запуску `python main.py`;
+- запуску Alembic/migration wrapper;
+- `create_admin.py`;
+- генерації OpenAPI у `af-docs`, бо docs import-ить FastAPI `app`.
+
+### Приклад
+
+```text
+Connection_string=postgresql+asyncpg://postgres:postgres@localhost:5432/addproject
+BOT_TOKEN=telegram-bot-token
+SECRET_KEY=change-me-long-random-string
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+SECRET_TEAM_CODE=team-registration-code
+FIREBASE_CREDENTIALS_PATH=firebase_key.json
+UPLOAD_DIR=uploads
+BOT_USERNAME=your_bot_username
+API_HOST=0.0.0.0
+API_PORT=8000
+REMINDER_DAY_OF_WEEK=mon
+REMINDER_HOURS=9
+REMINDER_MINUTE=0
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=change-me
+ADMIN_NAME=Administrator
+ADMIN_TELEGRAM_ID=
+ADMIN_IDS=
+APP_ENV=development
+LOG_LEVEL=INFO
+MAX_UPLOAD_FILE_SIZE_MB=50
+ALLOWED_UPLOAD_MIME_PREFIXES=image/,video/,audio/
+ALLOWED_UPLOAD_MIME_TYPES=application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain
+```
+
+### Обов'язкові змінні
+
+| Змінна | Опис |
+| --- | --- |
+| `Connection_string` | SQLAlchemy async PostgreSQL DSN. Runtime використовує `postgresql+asyncpg://...`; migrations конвертують URL для sync driver. |
+| `BOT_TOKEN` | Token Telegram bot. У коді також використовується як `API_TOKEN`. |
+| `SECRET_KEY` | Secret для підпису JWT access tokens. Має бути довгим випадковим значенням. |
+| `ALGORITHM` | JWT algorithm, зазвичай `HS256`. |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Час життя access token у хвилинах. Має бути цілим числом. |
+| `SECRET_TEAM_CODE` | Код команди для реєстрації користувача. |
+| `FIREBASE_CREDENTIALS_PATH` | Шлях до Firebase Admin service account JSON. Якщо шлях відносний, запускайте API з `af_api`. |
+| `UPLOAD_DIR` | Директорія для upload files. API монтує її як `/uploads`. |
+| `BOT_USERNAME` | Username Telegram bot без секретного token. |
+| `API_HOST` | Host для `uvicorn`, наприклад `0.0.0.0` або `127.0.0.1`. |
+| `API_PORT` | Port для `uvicorn`. Має збігатися з `API_BASE_URL` у frontend. |
+| `REMINDER_DAY_OF_WEEK` | День тижня для scheduled reminder, наприклад `mon`. |
+| `REMINDER_HOURS` | Година для scheduled reminder. |
+| `REMINDER_MINUTE` | Хвилина для scheduled reminder. |
+| `ADMIN_USERNAME` | Username seed/admin користувача для `create_admin.py`. |
+| `ADMIN_PASSWORD` | Password seed/admin користувача для `create_admin.py`. |
+| `ADMIN_NAME` | Display name seed/admin користувача. |
+| `APP_ENV` | Поточне середовище. `development` вмикає детальніші request logs. |
+| `LOG_LEVEL` | Рівень логування, наприклад `INFO` або `DEBUG`. |
+
+### Опційні змінні
+
+| Змінна | Default | Опис |
+| --- | --- | --- |
+| `ADMIN_TELEGRAM_ID` | empty | Telegram ID admin користувача. Якщо задано, має бути цілим числом. |
+| `ADMIN_IDS` | empty | Comma-separated список admin user IDs. |
+| `MAX_UPLOAD_FILE_SIZE_MB` | `50` | Максимальний розмір одного upload file у MB. |
+| `ALLOWED_UPLOAD_MIME_PREFIXES` | `image/,video/,audio/` | Comma-separated список дозволених MIME prefixes. |
+| `ALLOWED_UPLOAD_MIME_TYPES` | documents/text defaults | Comma-separated список точних MIME types для документів. |
+
+## Frontend: `af_app/config/*.env`
+
+Flutter client читає конфігурацію у `lib/config/app_config.dart`.
+
+Порядок завантаження:
+
+1. Якщо build/run передає compile-time значення `APP_ENV` і `API_BASE_URL` через `--dart-define`, app використовує їх.
+2. Якщо обов'язкових compile-time значень немає, app обирає fallback file: `config/dev.env` для debug/development або `config/prod.env` для production.
+3. Значення з `--dart-define` мають пріоритет над asset `.env` файлами.
+
+Файли `config/dev.env` і `config/prod.env` додані в `pubspec.yaml` як Flutter assets.
+
+### `config/dev.env`
+
+```text
+APP_ENV=development
+API_BASE_URL=http://10.0.2.2:8080
+CONNECT_TIMEOUT_MS=10000
+RECEIVE_TIMEOUT_MS=10000
+ENABLE_VERBOSE_LOGGING=false
+```
+
+`10.0.2.2` - це alias Android Emulator для host machine. Port у `API_BASE_URL` має збігатися з backend `API_PORT`. Якщо API запускається на `8000`, використовуйте `http://10.0.2.2:8000`.
+
+### `config/prod.env`
+
+```text
+APP_ENV=production
+API_BASE_URL=https://api.example.com
+CONNECT_TIMEOUT_MS=10000
+RECEIVE_TIMEOUT_MS=10000
+ENABLE_VERBOSE_LOGGING=false
+```
+
+Перед release build замініть `https://api.example.com` на реальний HTTPS endpoint backend.
+
+### Змінні frontend
+
+| Змінна | Required | Опис |
+| --- | --- | --- |
+| `APP_ENV` | yes | `development` або `production`. Інші значення app відхиляє на старті. |
+| `API_BASE_URL` | yes | Абсолютний `http` або `https` URL backend без trailing slash. |
+| `CONNECT_TIMEOUT_MS` | no | Timeout підключення Dio у мілісекундах. Default: `10000`. |
+| `RECEIVE_TIMEOUT_MS` | no | Timeout отримання відповіді Dio у мілісекундах. Default: `10000`. |
+| `ENABLE_VERBOSE_LOGGING` | no | `true/false`, `1/0`, `yes/no` або `on/off`. Default: `false`. |
+
+### Локальні URL
+
+| Ціль запуску | Приклад `API_BASE_URL` |
+| --- | --- |
+| Android Emulator | `http://10.0.2.2:8000` |
+| Physical Android device | `http://<LAN-IP>:8000` |
+| Windows/macOS/Linux desktop | `http://localhost:8000` |
+| Production | `https://<api-domain>` |
+
+### Override без зміни asset files
+
+```powershell
+cd af_app
+flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://10.0.2.2:8000
+```
+
+```powershell
+cd af_app
+flutter build apk --release --dart-define=APP_ENV=production --dart-define=API_BASE_URL=https://api.example.com
+```
+
+Firebase client configuration не читається з цих `.env` файлів. Для Android вона береться з `android/app/google-services.json`; backend push sending використовує `FIREBASE_CREDENTIALS_PATH` у `af_api/.env`.

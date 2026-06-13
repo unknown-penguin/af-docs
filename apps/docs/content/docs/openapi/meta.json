@@ -1,6 +1,6 @@
 {
-  "title": "OpenAPI Example",
-  "description": "A demo for OpenAPI schema",
+  "title": "AF API",
+  "description": "Endpoint reference для FastAPI backend",
   "icon": "Globe",
   "pages": ["index", "...(generated)"]
 }

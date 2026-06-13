@@ -7,6 +7,7 @@ const COMMON_FIELDS = {
 const SERVER_FIELDS = {
   KROKI_BASE_URL: z.string().min(1),
   API_RES_PATH: z.string().min(1),
+  AF_API_ROOT: z.string().min(1),
   IS_PROD_STATIC: z.boolean(),
   GITHUB_PAGES_REPO_NAME: z.string().min(1).optional(),
 } as const;
@@ -39,10 +40,11 @@ export const SERVER_ENV = () => {
 
   return createEnv(SERVER_ENV_SCHEMA, {
     NEXT_PUBLIC_IS_PROD: process.env.NODE_ENV === 'production',
-    KROKI_BASE_URL: process.env.KROKI_BASE_URL ?? 'https://kroki.io',
+    KROKI_BASE_URL: process.env.KROKI_BASE_URL ?? 'http://localhost:8000',
     API_RES_PATH: process.env.API_RES_PATH ?? 'openapi',
+    AF_API_ROOT: process.env.AF_API_ROOT ?? '../../../af_api',
     IS_PROD_STATIC: process.env.IS_PROD_STATIC === 'true',
-    GITHUB_PAGES_REPO_NAME: process.env.GITHUB_PAGES_REPO_NAME ?? 'hyperion-docs',
+    GITHUB_PAGES_REPO_NAME: process.env.GITHUB_PAGES_REPO_NAME ?? 'af-docs',
   });
 };
 

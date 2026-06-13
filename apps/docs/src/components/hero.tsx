@@ -58,7 +58,7 @@ export const Hero: FC = () => {
               y: 0,
             }}
           >
-            Ready to go documentation stack
+            Архітектура, API та діаграми поточної реалізації
           </motion.div>
           <motion.h1
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -75,7 +75,7 @@ export const Hero: FC = () => {
               y: 0,
             }}
           >
-            Developer-first documentation
+            AF Docs
           </motion.h1>
           <motion.p
             className="font-light text-neutral-300/80 text-lg text-balance"
@@ -89,7 +89,7 @@ export const Hero: FC = () => {
               y: 0,
             }}
           >
-            Built for developer experience with one-command setup and hot reload in Docker.
+            Українська технічна документація для Flutter застосунку, FastAPI backend, інтеграцій, потоків і схеми даних.
           </motion.p>
           <motion.div
             className="flex flex-col gap-2"
@@ -107,7 +107,7 @@ export const Hero: FC = () => {
               href="/docs"
               className="bg-white hover:bg-zinc-100 px-4 py-2 border rounded-full text-black text-sm hover:scale-95 transition-all duration-300"
             >
-              Get started
+              Відкрити документацію
             </Link>
           </motion.div>
 
@@ -124,15 +124,15 @@ export const Hero: FC = () => {
               y: 0,
             }}
           >
-            <Pre className="text-zinc-300">git clone https://github.com/wallwhite/hyperion-docs.git</Pre>
+            <Pre className="text-zinc-300">cd af-docs</Pre>
             <br />
-            <Pre className="text-zinc-500"># Navigate to the project directory</Pre>
+            <Pre className="text-zinc-500"># Оновити AF OpenAPI reference</Pre>
             <br />
-            <Pre className="text-zinc-300">cd hyperion-docs</Pre>
+            <Pre className="text-zinc-300">pnpm build:openapi</Pre>
             <br />
-            <Pre className="text-zinc-500"># Run start command</Pre>
+            <Pre className="text-zinc-500"># Запустити локально</Pre>
             <br />
-            <Pre className="text-zinc-300">./scripts/dev.sh</Pre>
+            <Pre className="text-zinc-300">pnpm dev</Pre>
           </MotionCodeBlock>
         </div>
       </section>

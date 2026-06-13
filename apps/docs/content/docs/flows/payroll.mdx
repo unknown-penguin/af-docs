@@ -1,0 +1,16 @@
+---
+title: Payroll
+description: Payroll reports, review і Telegram notification
+icon: ReceiptText
+---
+
+# Payroll report flow
+
+Працівник створює payroll report через Flutter screen. Backend зберігає report, media rows і файли, після чого повідомляє admin/superadmin у Telegram.
+
+<Diagram lang="mermaid" path="payroll.mmd" alt="Payroll report sequence" />
+
+## Access control
+
+- Створювати payroll report може authenticated user.
+- Переглядати reports, objects і marking checked можуть ролі `superadmin`, `admin`, `manager`.

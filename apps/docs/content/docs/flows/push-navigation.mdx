@@ -1,0 +1,15 @@
+---
+title: Push Navigation
+description: FCM token, push event і перехід на TaskDetailScreen
+icon: BellRing
+---
+
+# Push navigation
+
+Flutter app ініціалізує Firebase Messaging після успішного auto-login, відправляє FCM token у backend і слухає foreground/background push events.
+
+<Diagram lang="mermaid" path="push-navigation.mmd" alt="Push notification navigation sequence" />
+
+## Навігація
+
+Якщо push payload містить `task_id`, `PushNotificationService` відкриває `TaskDetailScreen(taskId: ...)` через глобальний `navigatorKey`.

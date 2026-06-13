@@ -1,0 +1,24 @@
+flowchart TB
+    user["Користувач AF"]
+
+    subgraph af["AF"]
+        app["Flutter app<br/>UI, cache, offline queue, push navigation"]
+        api["FastAPI API<br/>Auth, tasks, comments, payroll, media"]
+        db[("PostgreSQL<br/>Business data")]
+        storage[("Upload storage<br/>Task/comment/payroll files")]
+        scheduler["APScheduler<br/>Reminder job"]
+        migrations["Alembic migrations<br/>Startup schema upgrade"]
+    end
+
+    telegram["Telegram Bot API"]
+    fcm["Firebase Cloud Messaging"]
+
+    user --> app
+    app -->|"HTTPS JSON / multipart"| api
+    api -->|"SQLAlchemy async"| db
+    api -->|"read/write files"| storage
+    api -->|"aiogram"| telegram
+    api -->|"Firebase Admin SDK"| fcm
+    scheduler --> db
+    scheduler --> fcm
+    migrations --> db

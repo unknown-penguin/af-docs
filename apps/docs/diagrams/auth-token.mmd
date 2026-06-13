@@ -1,0 +1,33 @@
+sequenceDiagram
+    actor User as Користувач
+    participant App as Flutter app
+    participant ApiService
+    participant API as FastAPI auth routes
+    participant Security as security.py
+    participant DB as PostgreSQL
+    participant Local as SharedPreferences
+
+    User->>App: Вводить username/password
+    App->>ApiService: login(username, password)
+    ApiService->>API: POST /token
+    API->>DB: select User by username
+    API->>Security: verify_password()
+    Security-->>API: password valid
+    API->>Security: create_access_token()
+    API-->>ApiService: access_token, token_type
+    ApiService->>Local: save auth_token
+    ApiService->>API: GET /users/me
+    API->>Security: get_current_user()
+    Security->>DB: load User by JWT sub
+    API-->>ApiService: UserBase
+    ApiService->>Local: cache current user
+    ApiService-->>App: logged in
+
+    Note over App,ApiService: Startup auto-login
+    App->>ApiService: tryAutoLogin()
+    ApiService->>Local: read auth_token
+    ApiService->>API: POST /refresh
+    API->>Security: get_current_user()
+    API->>Security: create_access_token()
+    API-->>ApiService: refreshed token
+    ApiService->>Local: replace auth_token

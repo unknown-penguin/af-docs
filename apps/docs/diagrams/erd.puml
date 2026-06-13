@@ -1,34 +1,98 @@
-@startuml
-package App as App {
-  entity User {
-    * id : UUID
-    --
-    * email : String
-    * name : String
-    created_at : DateTime
-  }
+@startuml af-erd
+hide circle
+skinparam linetype ortho
+title AF API - Entity Relationship Diagram
 
-  entity Post {
-    * id : UUID
-    --
-    * title : String
-    * category_id : UUID
-    * content : Text
-    * user_id : UUID <<FK>>
-    published_at : DateTime
-  }
-
-  entity Comment {
-    * id : UUID
-    --
-    * content : Text
-    * user_id : UUID <<FK>>
-    * post_id : UUID <<FK>>
-    created_at : DateTime
-  }
-
-  User ||--o{ Post : "creates"
-  User ||--o{ Comment : "writes"
-  Post ||--o{ Comment : "has"
+entity "users" as users {
+  * id : integer <<PK>>
+  --
+  telegram_id : bigint <<unique>>
+  name : string
+  username : string <<unique>>
+  password : string
+  role : string
+  joined_at : timestamptz
+  fcm_token : string
+  requested_role : string
+  telegram_sync_code : string
 }
+
+entity "tasks" as tasks {
+  * task_id : integer <<PK>>
+  --
+  text : text
+  status : string
+  created_at : timestamptz
+  creator_id : integer <<FK users.id>>
+  completed_by : integer <<FK users.id>>
+}
+
+entity "task_assignments" as task_assignments {
+  * id : integer <<PK>>
+  --
+  task_id : integer <<FK tasks.task_id>>
+  user_id : integer <<FK users.id>>
+  message_id : bigint
+}
+
+entity "task_media" as task_media {
+  * media_id : integer <<PK>>
+  --
+  task_id : integer <<FK tasks.task_id>>
+  file_path : string
+  file_type : string
+  original_name : string
+  size_bytes : integer
+  duration_seconds : float
+}
+
+entity "task_messages" as task_messages {
+  * msg_id : integer <<PK>>
+  --
+  task_id : integer <<FK tasks.task_id>>
+  sender_id : integer <<FK users.id>>
+  text : text
+  created_at : timestamptz
+}
+
+entity "message_media" as message_media {
+  * id : integer <<PK>>
+  --
+  msg_id : integer <<FK task_messages.msg_id>>
+  file_path : string
+  file_type : string
+  original_name : string
+  size_bytes : integer
+  duration_seconds : float
+}
+
+entity "payroll_reports" as payroll_reports {
+  * id : integer <<PK>>
+  --
+  user_id : integer <<FK users.id>>
+  object_name : string
+  comment : text
+  is_checked : boolean
+  created_at : timestamptz
+}
+
+entity "payroll_media" as payroll_media {
+  * id : integer <<PK>>
+  --
+  report_id : integer <<FK payroll_reports.id>>
+  file_path : string
+  file_type : string
+}
+
+users ||--o{ tasks : "creator_id"
+users ||--o{ tasks : "completed_by"
+users ||--o{ task_assignments : "user_id"
+tasks ||--o{ task_assignments : "task_id"
+tasks ||--o{ task_media : "task_id"
+tasks ||--o{ task_messages : "task_id"
+users ||--o{ task_messages : "sender_id"
+task_messages ||--o{ message_media : "msg_id"
+users ||--o{ payroll_reports : "user_id"
+payroll_reports ||--o{ payroll_media : "report_id"
+
 @enduml

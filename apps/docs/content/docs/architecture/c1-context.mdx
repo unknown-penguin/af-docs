@@ -1,0 +1,20 @@
+---
+title: C1 Context
+description: Контекст системи AF і зовнішні залежності
+icon: Network
+---
+
+# C1 Context
+
+AF складається з мобільного Flutter застосунку та FastAPI backend. Користувачі працюють із задачами, коментарями, payroll-звітами, профілем і push/Telegram інтеграціями.
+
+<Diagram lang="mermaid" path="c1-context.mmd" alt="C1 context diagram for AF" />
+
+## Зовнішні системи
+
+| Система | Роль |
+| --- | --- |
+| Telegram Bot API | Доставка повідомлень про задачі, коментарі, payroll і reopen/complete події |
+| Firebase Cloud Messaging | Push notifications у Flutter застосунок |
+| PostgreSQL | Основні бізнес-дані |
+| Upload storage | Файли задач, коментарів і payroll-звітів |

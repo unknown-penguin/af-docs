@@ -11,7 +11,7 @@ export const baseOptions = (): BaseLayoutProps => {
         <>
           <Logo className="w-6 h-6" />
           <span className="flex items-center gap-1">
-            Hyperion
+            AF
             <span className="text-gray-400">Docs</span>
           </span>
         </>

@@ -1,0 +1,33 @@
+sequenceDiagram
+    actor Admin as Admin/Superadmin
+    participant App as Flutter app
+    participant ApiService
+    participant API as FastAPI /tasks
+    participant Media as Media helpers
+    participant Files as uploads/
+    participant DB as PostgreSQL
+    participant TG as Telegram Bot API
+    participant FCM as Firebase Cloud Messaging
+
+    Admin->>App: Створює задачу з виконавцями і файлами
+    App->>ApiService: createTask(text, executorIds, files)
+    ApiService->>API: POST /tasks multipart/form-data
+    API->>DB: insert Task
+    API->>DB: insert TaskAssignment rows
+    loop кожен файл
+        API->>Files: write upload
+        API->>Media: normalize video / extract duration
+        API->>DB: insert TaskMedia
+    end
+    API->>DB: commit transaction
+    API->>DB: select assigned users
+    loop кожен отримувач
+        alt має telegram_id
+            API->>TG: send task message/media
+        end
+        alt має fcm_token
+            API->>FCM: send new_task push
+        end
+    end
+    API-->>ApiService: TaskResponse
+    ApiService-->>App: success

@@ -1,0 +1,57 @@
+@startuml af-c3-components
+!include <C4/C4_Component>
+
+LAYOUT_WITH_LEGEND()
+title AF - C3 Components
+
+Container_Boundary(app, "Flutter app") {
+  Component(screens, "Screens", "Flutter widgets", "Login, register, tasks, task details, profile, menu, payroll, employees.")
+  Component(api_service, "ApiService", "Dio + ChangeNotifier", "REST client, JWT header injection, cache, offline queue.")
+  Component(push_service, "PushNotificationService", "Firebase Messaging", "FCM token registration, foreground refresh stream, push tap navigation.")
+  Component(config, "AppConfig", "Dart config loader", "Loads dev/prod env assets and resolves upload URLs.")
+  Component(local_state, "SharedPreferences", "Local storage", "JWT, user profile cache, task cache, offline action queue, theme.")
+}
+
+Container_Boundary(api, "FastAPI API") {
+  Component(auth_routes, "Auth routes", "FastAPI router", "/token, /refresh, /register, /users/me, /users/fcm-token.")
+  Component(user_routes, "User routes", "FastAPI router", "Profile, employees, role requests, Telegram link.")
+  Component(task_routes, "Task routes", "FastAPI endpoints", "Task CRUD, comments, complete, reopen, history, active/my tasks.")
+  Component(payroll_routes, "Payroll routes", "FastAPI endpoints", "Create reports, objects, reports list, mark checked.")
+  Component(security, "Security", "JWT/passlib", "Password hashing, token creation, get_current_user dependency.")
+  Component(media_services, "Media services", "Python services", "Media duration extraction and video playback normalization.")
+  Component(db_session, "DB session", "SQLAlchemy async", "Async engine, sessionmaker, dependency injection.")
+  Component(notifications, "Notification helpers", "aiogram + Firebase Admin", "Telegram messages and FCM pushes.")
+  Component(reminders, "Reminder job", "APScheduler", "Scheduled reminders for active assignments.")
+}
+
+ContainerDb(db, "PostgreSQL", "Database")
+Container(storage, "Upload storage", "File system")
+System_Ext(telegram, "Telegram Bot API")
+System_Ext(fcm, "Firebase Cloud Messaging")
+
+Rel(screens, api_service, "Calls")
+Rel(screens, push_service, "Initializes after login")
+Rel(api_service, local_state, "Stores tokens, cache, offline queue")
+Rel(api_service, auth_routes, "Auth/profile requests")
+Rel(api_service, user_routes, "User requests")
+Rel(api_service, task_routes, "Task requests")
+Rel(api_service, payroll_routes, "Payroll requests")
+Rel(push_service, api_service, "Sends FCM token")
+Rel(push_service, screens, "Opens TaskDetailScreen")
+
+Rel(auth_routes, security, "Creates/verifies JWT")
+Rel(task_routes, media_services, "Normalizes uploads")
+Rel(task_routes, notifications, "Notifies")
+Rel(payroll_routes, notifications, "Notifies admins")
+Rel(user_routes, db_session, "Uses")
+Rel(auth_routes, db_session, "Uses")
+Rel(task_routes, db_session, "Uses")
+Rel(payroll_routes, db_session, "Uses")
+Rel(db_session, db, "SQL")
+Rel(media_services, storage, "Reads/writes")
+Rel(notifications, telegram, "Bot API")
+Rel(notifications, fcm, "FCM")
+Rel(reminders, db_session, "Reads active tasks")
+Rel(reminders, notifications, "Sends reminders")
+
+@enduml

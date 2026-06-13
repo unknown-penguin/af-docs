@@ -1,0 +1,10 @@
+{
+  "title": "Архітектура",
+  "icon": "Network",
+  "pages": [
+    "c1-context",
+    "c2-containers",
+    "c3-components",
+    "c4-code"
+  ]
+}

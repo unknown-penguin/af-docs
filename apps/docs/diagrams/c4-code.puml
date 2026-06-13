@@ -1,0 +1,119 @@
+@startuml af-c4-code
+skinparam linetype ortho
+skinparam packageStyle rectangle
+hide empty members
+title AF - C4 Code Level
+
+package "af_app/lib" {
+  class ApiService {
+    +login(username, password)
+    +tryAutoLogin()
+    +getActiveTasks()
+    +getTaskDetails(taskId)
+    +createTask(text, executorIds, files)
+    +addComment(taskId, text, files)
+    +completeTask(taskId)
+    +submitPayrollReport(...)
+    +sendFcmToken(token)
+  }
+
+  class PushNotificationService {
+    +initialize(apiService, logger)
+    +getInitialMessage()
+    -_handleNotificationTap(message)
+  }
+
+  class AppConfig {
+    +load()
+    +resolveUploadUrl(dbPath)
+  }
+
+  class "Screens" as FlutterScreens {
+    LoginScreen
+    TasksPage
+    TaskDetailScreen
+    ProfileScreen
+    SubmitPayrollScreen
+    EmployeesScreen
+  }
+}
+
+package "af_api" {
+  class "main.py task/payroll endpoints" as MainRoutes {
+    +create_task()
+    +update_task()
+    +add_task_comment()
+    +complete_task()
+    +create_payroll_report()
+    +check_reminders()
+  }
+
+  class "auth.py router" as AuthRouter {
+    +login_for_access_token()
+    +refresh_token()
+    +register_user()
+    +update_fcm_token()
+  }
+
+  class "users.py router" as UsersRouter {
+    +get_all_users()
+    +change_user_role()
+    +get_telegram_link()
+  }
+
+  class "security.py" as Security {
+    +create_access_token()
+    +get_current_user()
+    +get_password_hash()
+    +verify_password()
+  }
+
+  class "session.py" as DbSession {
+    +engine
+    +AsyncSessionLocal
+    +get_db()
+  }
+
+  class "media_normalization.py" as MediaNormalization
+  class "media_metadata.py" as MediaMetadata
+  class "models.py" as Models
+}
+
+package "SQLAlchemy models" {
+  class User
+  class Task
+  class TaskAssignment
+  class TaskMedia
+  class TaskMessage
+  class MessageMedia
+  class PayrollReport
+  class PayrollMedia
+}
+
+FlutterScreens --> ApiService : викликає
+FlutterScreens --> PushNotificationService : ініціалізує
+ApiService --> AppConfig : base URL
+ApiService --> AuthRouter : /token, /refresh, /users/me
+ApiService --> UsersRouter : /users/*
+ApiService --> MainRoutes : /tasks/*, /payroll/*
+PushNotificationService --> ApiService : /users/fcm-token
+
+AuthRouter --> Security : JWT/password
+AuthRouter --> DbSession : AsyncSession
+UsersRouter --> Security : current user
+UsersRouter --> DbSession : AsyncSession
+MainRoutes --> Security : current user
+MainRoutes --> DbSession : AsyncSession
+MainRoutes --> MediaNormalization : video normalization
+MainRoutes --> MediaMetadata : duration metadata
+DbSession --> Models : persists
+Models --> User
+Models --> Task
+Models --> TaskAssignment
+Models --> TaskMedia
+Models --> TaskMessage
+Models --> MessageMedia
+Models --> PayrollReport
+Models --> PayrollMedia
+
+@enduml

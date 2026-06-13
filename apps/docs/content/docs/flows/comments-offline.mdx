@@ -1,0 +1,17 @@
+---
+title: Comments + Offline
+description: Коментарі, вкладення і offline queue
+icon: MessagesSquare
+---
+
+# Коментарі та offline queue
+
+Коли мережа доступна, `ApiService.addComment` одразу відправляє multipart request на `/tasks/{task_id}/comments`. При network error дія зберігається у `offline_action_queue` і повторюється під час наступного sync.
+
+<Diagram lang="mermaid" path="comments-offline.mmd" alt="Comment and offline queue sequence" />
+
+## Поведінка
+
+- Offline queue підтримує `complete_task` і `add_comment`.
+- Task list і task details кешуються у `SharedPreferences`.
+- Після успішного sync невдалі network-дiї залишаються в queue, а успішні видаляються.

@@ -23,7 +23,7 @@ const IconMap = {
 
 export const Diagram = forwardRef<HTMLDivElement, DiagramProps>(({ lang, path, className, chart }, ref) => {
   const diagramId = useId();
-  const { svg, isLoading } = useSvgDiagramMarkup({ lang, path, chart });
+  const { svg, isLoading, error } = useSvgDiagramMarkup({ lang, path, chart });
 
   const modal = useModal(PreviewModal);
 
@@ -49,17 +49,19 @@ export const Diagram = forwardRef<HTMLDivElement, DiagramProps>(({ lang, path, c
             <Icon className="size-4" />
             {LANG_NAME_MAP[lang as keyof typeof LANG_NAME_MAP]} Diagram Preview
           </div>
-          <div className="flex items-center gap-2">
-            <ExportMenu svg={svg} diagramId={diagramId} />
-            <button
-              type="button"
-              className="group flex items-center gap-2 bg-zinc-300 hover:bg-zinc-400/50 p-2 rounded-md text-zinc-700 text-xs transition-colors duration-200 cursor-pointer"
-              onClick={handleOpenWhiteboardModal}
-            >
-              <ExpandIcon className="size-3 group-hover:scale-120 transition-transform duration-200" />
-              Open Whiteboard
-            </button>
-          </div>
+          {!!svg && (
+            <div className="flex items-center gap-2">
+              <ExportMenu svg={svg} diagramId={diagramId} />
+              <button
+                type="button"
+                className="group flex items-center gap-2 bg-zinc-300 hover:bg-zinc-400/50 p-2 rounded-md text-zinc-700 text-xs transition-colors duration-200 cursor-pointer"
+                onClick={handleOpenWhiteboardModal}
+              >
+                <ExpandIcon className="size-3 group-hover:scale-120 transition-transform duration-200" />
+                Open Whiteboard
+              </button>
+            </div>
+          )}
         </div>
       )}
       {!!isLoading && (
@@ -67,11 +69,20 @@ export const Diagram = forwardRef<HTMLDivElement, DiagramProps>(({ lang, path, c
           <LoaderIcon role="status" aria-label="Loading" className={cn('size-6 animate-spin', className)} /> Loading...
         </div>
       )}
-      <div
-        data-diagram-id={diagramId}
-        className="flex justify-center items-center w-full [&>svg]:!w-full h-full [&>svg]:!h-auto"
-        dangerouslySetInnerHTML={{ __html: svg }}
-      />
+      {error ? (
+        <div className="flex flex-1 justify-center items-center p-6 min-h-[240px] text-center text-red-700">
+          <div>
+            <p className="font-semibold">Не вдалося відрендерити діаграму.</p>
+            <p className="mt-2 text-sm text-red-600">{error}</p>
+          </div>
+        </div>
+      ) : (
+        <div
+          data-diagram-id={diagramId}
+          className="flex justify-center items-center w-full [&>svg]:!w-full h-full [&>svg]:!h-auto"
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      )}
     </div>
   );
 });

@@ -1,0 +1,19 @@
+---
+title: C4 Code
+description: Code-level view основних класів і модулів
+icon: Code
+---
+
+# C4 Code
+
+Code-level view фокусується на зв'язку `ApiService -> FastAPI routes -> SQLAlchemy models/services`. Це не повний class diagram, а карта найважливіших runtime-залежностей.
+
+<Diagram lang="mermaid" path="c4-code.mmd" alt="Code-level diagram for AF" />
+
+## Основна лінія виконання
+
+1. Flutter screen викликає метод `ApiService`.
+2. `ApiService` додає JWT bearer token через Dio interceptor.
+3. FastAPI dependency `get_current_user` декодує JWT і завантажує користувача.
+4. Route працює з SQLAlchemy models через `AsyncSession`.
+5. За потреби route пише файли у `uploads/` і відправляє Telegram/FCM notifications.

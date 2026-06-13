@@ -1,0 +1,21 @@
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: apps/docs/Dockerfile.prod
+    environment:
+      - NODE_ENV=production
+      - API_RES_PATH=openapi
+      - AF_OPENAPI_SKIP_EXPORT=true
+      - NEXT_OUTPUT=standalone
+      - KROKI_BASE_URL=http://kroki:8000
+      - DIAGRAMS_DIR=/app/diagrams
+    ports:
+      - "3000:3000"
+    depends_on:
+      - kroki
+
+  kroki:
+    image: yuzutech/kroki:latest
+    ports:
+      - "8000:8000"

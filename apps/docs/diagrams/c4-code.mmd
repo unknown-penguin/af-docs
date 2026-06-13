@@ -1,0 +1,56 @@
+flowchart LR
+    subgraph app["af_app/lib"]
+        flutterScreens["Screens"]
+        apiService["ApiService<br/>login, createTask, addComment, completeTask, submitPayrollReport"]
+        pushService["PushNotificationService<br/>initialize, getInitialMessage, handle tap"]
+        config["AppConfig<br/>load, resolveUploadUrl"]
+    end
+
+    subgraph api["af_api"]
+        authRouter["auth.py router"]
+        usersRouter["users.py router"]
+        mainRoutes["main.py task/payroll endpoints"]
+        security["security.py"]
+        dbSession["session.py"]
+        mediaNormalize["media_normalization.py"]
+        mediaMetadata["media_metadata.py"]
+        models["models.py"]
+    end
+
+    subgraph modelClasses["SQLAlchemy models"]
+        user["User"]
+        task["Task"]
+        assignment["TaskAssignment"]
+        taskMedia["TaskMedia"]
+        message["TaskMessage"]
+        messageMedia["MessageMedia"]
+        report["PayrollReport"]
+        payrollMedia["PayrollMedia"]
+    end
+
+    flutterScreens --> apiService
+    flutterScreens --> pushService
+    apiService --> config
+    apiService --> authRouter
+    apiService --> usersRouter
+    apiService --> mainRoutes
+    pushService --> apiService
+
+    authRouter --> security
+    usersRouter --> security
+    mainRoutes --> security
+    authRouter --> dbSession
+    usersRouter --> dbSession
+    mainRoutes --> dbSession
+    mainRoutes --> mediaNormalize
+    mainRoutes --> mediaMetadata
+    dbSession --> models
+
+    models --> user
+    models --> task
+    models --> assignment
+    models --> taskMedia
+    models --> message
+    models --> messageMedia
+    models --> report
+    models --> payrollMedia

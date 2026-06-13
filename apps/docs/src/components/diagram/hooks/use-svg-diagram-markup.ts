@@ -7,6 +7,7 @@ export const useSvgDiagramMarkup = ({ lang, path, chart }: DiagramParamsBase) =>
   const id = useId();
   const [svg, setSvg] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [mermaidContent, setMermaidContent] = useState<string>('');
 
   const requestConfig = useMemo(() => {
@@ -58,6 +59,7 @@ export const useSvgDiagramMarkup = ({ lang, path, chart }: DiagramParamsBase) =>
 
     const fetchDiagram = async () => {
       setIsLoading(true);
+      setError(null);
 
       const fetchOptions: RequestInit = {
         method: requestConfig.method,
@@ -69,7 +71,10 @@ export const useSvgDiagramMarkup = ({ lang, path, chart }: DiagramParamsBase) =>
       }
 
       const response = await fetch(requestConfig.url, fetchOptions).then(async (res) => {
-        if (!res.ok) throw new Error(`Diagram fetch failed: ${res.status}`);
+        if (!res.ok) {
+          const message = await res.text().catch(() => '');
+          throw new Error(message || `Diagram fetch failed: ${res.status}`);
+        }
 
         return res.text();
       });
@@ -84,8 +89,10 @@ export const useSvgDiagramMarkup = ({ lang, path, chart }: DiagramParamsBase) =>
       }
     };
 
-    fetchDiagram().catch(() => {
-      console.error('Error while fetching diagram');
+    fetchDiagram().catch((fetchError) => {
+      const message = fetchError instanceof Error ? fetchError.message : 'Diagram fetch failed';
+      console.error('Error while fetching diagram', fetchError);
+      setError(message);
       setIsLoading(false);
     });
   }, [requestConfig, lang]);
@@ -102,6 +109,7 @@ export const useSvgDiagramMarkup = ({ lang, path, chart }: DiagramParamsBase) =>
 
       try {
         setIsLoading(true);
+        setError(null);
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'loose',
@@ -116,14 +124,17 @@ export const useSvgDiagramMarkup = ({ lang, path, chart }: DiagramParamsBase) =>
         setIsLoading(false);
       } catch (error) {
         console.error('Error while rendering mermaid', error);
+        setError(error instanceof Error ? error.message : 'Mermaid render failed');
         setIsLoading(false);
       }
     };
 
-    renderChart().catch(() => {
-      console.error('Error while rendering mermaid');
+    renderChart().catch((renderError) => {
+      console.error('Error while rendering mermaid', renderError);
+      setError(renderError instanceof Error ? renderError.message : 'Mermaid render failed');
+      setIsLoading(false);
     });
   }, [chart, mermaidContent, id, lang]);
 
-  return { svg, isLoading };
+  return { svg, isLoading, error };
 };

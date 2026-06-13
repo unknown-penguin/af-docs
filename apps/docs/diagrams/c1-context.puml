@@ -1,0 +1,27 @@
+@startuml af-c1-context
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+title AF - C1 Context
+
+Person(employee, "Працівник", "Працює із призначеними задачами, коментарями, профілем і payroll-звітами.")
+Person(manager, "Менеджер", "Переглядає payroll reports і активність по об'єктах.")
+Person(admin, "Адміністратор", "Створює, редагує, уточнює, відкриває та закриває задачі.")
+
+System(af, "AF", "Мобільний застосунок і backend для задач, коментарів, вкладень, payroll та нотифікацій.")
+
+System_Ext(telegram, "Telegram Bot API", "Повідомлення про задачі, коментарі, payroll і статуси.")
+System_Ext(fcm, "Firebase Cloud Messaging", "Push notifications у Flutter app.")
+System_Ext(postgres, "PostgreSQL", "Основні бізнес-дані.")
+System_Ext(storage, "Upload storage", "Файли задач, коментарів і payroll reports.")
+
+Rel(employee, af, "Користується", "Flutter UI / HTTPS")
+Rel(manager, af, "Перевіряє payroll reports", "Flutter UI / HTTPS")
+Rel(admin, af, "Керує задачами та користувачами", "Flutter UI / HTTPS")
+
+Rel(af, telegram, "Надсилає повідомлення", "Bot API")
+Rel(af, fcm, "Надсилає push", "Firebase Admin SDK")
+Rel(af, postgres, "Читає та пише", "SQLAlchemy asyncpg")
+Rel(af, storage, "Зберігає та віддає файли", "File system / /uploads")
+
+@enduml

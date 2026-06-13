@@ -1,13 +1,18 @@
 import { createMDX } from 'fumadocs-mdx/next';
-import { SERVER_ENV } from './src/env.ts';
 
 const withMDX = createMDX();
-const isStatic = SERVER_ENV().IS_PROD_STATIC;
+const isStatic = process.env.IS_PROD_STATIC === 'true';
+const isStandalone =
+  process.env.NEXT_OUTPUT === 'standalone' ||
+  (!isStatic && process.env.NODE_ENV === 'production' && process.platform !== 'win32');
+const githubPagesRepoName = process.env.GITHUB_PAGES_REPO_NAME || 'af-docs';
 
 if (isStatic) {
   console.log('Building Docs as Static Export for GitHub Pages\n');
-} else {
+} else if (isStandalone) {
   console.log('Building Docs as Standalone Next.js App\n');
+} else {
+  console.log('Building Docs as standard Next.js output\n');
 }
 
 /** @type {import('next').NextConfig} */
@@ -17,9 +22,9 @@ const config = {
     output: 'export',
     distDir: 'out',
     images: { unoptimized: true },
-    basePath: '/' + SERVER_ENV().GITHUB_PAGES_REPO_NAME,
+    basePath: '/' + githubPagesRepoName,
   }),
-  ...(!isStatic && {
+  ...(isStandalone && {
     output: 'standalone',
   }),
   eslint: {
